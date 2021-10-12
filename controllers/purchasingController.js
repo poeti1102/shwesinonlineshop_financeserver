@@ -1,12 +1,10 @@
-const mongo = require("mongo");
-const mongoose = require("mongoose");
 const Purchasing = require("../models/purchasing");
 
 const list = (req, res) => {
   options = {
     sort: { purchaseDate: -1 },
-    offset: 20 * req.page,
-    limit: req.limit,
+    offset: req.params.limit * req.params.page,
+    limit: req.params.limit,
   };
 
   Purchasing.paginate({}, options).then(function (result) {
@@ -85,14 +83,14 @@ const single = (req, res) => {
   Purchasing.findById(req.params.id)
     .then((result) => {
       res.json({
-        message: "Success Create",
+        message: "Success",
         status: 200,
         data: result,
       });
     })
     .catch((error) => {
       res.json({
-        message: "Get Error",
+        message: "Error",
         status: 302,
         data: error,
       });

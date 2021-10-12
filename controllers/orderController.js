@@ -1,14 +1,12 @@
-const mongo = require("mongo");
-const mongoose = require("mongoose");
 const Order = require("../models/order");
+const { options } = require("../routes/orderRoutes");
 
 const list = (req, res) => {
-  options = {
+  let options = {
     sort: { orderDate: -1 },
-    offset: 20 * req.page,
-    limit: req.limit,
+    offset: req.params.limit * req.params.page,
+    limit: req.params.limit,
   };
-
   Order.paginate({}, options).then(function (result) {
     res.json({
       message: "Success Create",
@@ -20,13 +18,13 @@ const list = (req, res) => {
 
 const create = (req, res) => {
   const data = {
-    itemName: req.itemName,
-    price: req.price,
-    quantity: req.quantity,
-    orderDate: req.orderDate,
-    customerName: req.customerName,
-    customerDetail: req.customerDetail,
-    deliveryFee: req.deliveryFee,
+    itemName: req.body.itemName,
+    price: req.body.price,
+    quantity: req.body.quantity,
+    orderDate: req.body.orderDate,
+    customerName: req.body.customerName,
+    customerDetail: req.body.customerDetail,
+    deliveryFee: req.body.deliveryFee,
   };
 
   const order = new Order(data);
@@ -52,14 +50,14 @@ const single = (req, res) => {
   Order.findById(req.params.id)
     .then((result) => {
       res.json({
-        message: "Success Create",
+        message: "Succese",
         status: 200,
         data: result,
       });
     })
     .catch((error) => {
       res.json({
-        message: "Get Error",
+        message: "Error",
         status: 302,
         data: error,
       });
@@ -68,13 +66,13 @@ const single = (req, res) => {
 
 const edit = (req, res) => {
   const data = {
-    itemName: req.itemName,
-    price: req.price,
-    quantity: req.quantity,
-    orderDate: req.orderDate,
-    customerName: req.customerName,
-    customerDetail: req.customerDetail,
-    deliveryFee: req.deliveryFee,
+    itemName: req.body.itemName,
+    price: req.body.price,
+    quantity: req.body.quantity,
+    orderDate: req.body.orderDate,
+    customerName: req.body.customerName,
+    customerDetail: req.body.customerDetail,
+    deliveryFee: req.body.deliveryFee,
   };
 
   Order.findByIdAndUpdate(req.params.id, data)
@@ -113,18 +111,18 @@ const destroy = (req, res) => {
 };
 
 const search = (req, res) => {
-  const mode = req.searchMode;
+  const mode = req.body.searchMode;
   let query = {};
   switch (mode) {
     case "name":
-      query = { itemName: { $regex: ".*" + req.searchString + ".*" } };
+      query = { itemName: { $regex: ".*" + req.body.searchString + ".*" } };
       break;
 
     case "date":
       query = {
-        createdAt: {
-          $gte: new Date(req.startDate),
-          $lt: new Date(req.endDate),
+        orderDate: {
+          $gte: new Date(req.body.startDate),
+          $lte: new Date(req.body.endDate),
         },
       };
       break;
